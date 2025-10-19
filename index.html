@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dành Tặng Em Yêu 💝</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.03"/%3E%3C/svg%3E');
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.5;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(40px);
+            border-radius: 30px;
+            padding: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5),
+                        inset 0 0 100px rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .date-badge {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(255, 107, 157, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #ffd1dc 50%, #ff9ec7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .photo-section {
+            position: relative;
+        }
+
+        .photo-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg) translate(-50%, -50%); }
+            100% { transform: rotate(360deg) translate(-50%, -50%); }
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            filter: blur(40px);
+            z-index: -1;
+            animation: glow-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .message-section {
+            padding: 20px 0;
+        }
+
+        .message-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: #ffd1dc;
+        }
+
+        .message-text {
+            font-size: 1.1em;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .message-text p {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .message-text p::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: #ff9ec7;
+            font-size: 0.8em;
+        }
+
+        .signature {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: right;
+            font-size: 1.1em;
+        }
+
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float-up 8s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes float-up {
+            0% {
+                bottom: -50px;
+                opacity: 0;
+                transform: translateX(0) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 110%;
+                opacity: 0;
+                transform: translateX(100px) rotate(360deg);
+            }
+        }
+
+        .decorative-line {
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                transparent);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 40px 30px;
+            }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .message-title {
+                font-size: 1.5em;
+            }
+            
+            .message-text {
+                font-size: 1em;
+            }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle-anim 1s ease-out forwards;
+        }
+
+        @keyframes sparkle-anim {
+            0% {
+                opacity: 1;
+                transform: scale(0) translate(0, 0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1) translate(var(--tx), var(--ty));
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="grain"></div>
+    <div class="hearts-container" id="heartsContainer"></div>
+    
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="date-badge">20 • 10 • 2025</div>
+                <h1 class="main-title">Ngày Phụ Nữ Việt Nam</h1>
+                <p class="subtitle">Dành tặng người phụ nữ đặc biệt của tôi</p>
+            </div>
+            
+            <div class="decorative-line"></div>
+            
+            <div class="content-grid">
+                <div class="photo-section">
+                    <div class="photo-glow"></div>
+                    <div class="photo-frame">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop" alt="Ảnh của em" id="photo">
+                    </div>
+                </div>
+                
+                <div class="message-section">
+                    <h2 class="message-title">Gửi Công Chúa của anh</h2>
+                    <div class="message-text">
+                        <p>Chúc em một ngày 20/10 thật ý nghĩa và tràn ngập niềm vui</p>
+                        <p>Cảm ơn em đã luôn ở bên, đồng hành và yêu thương anh</p>
+                        <p>Chúc em luôn xinh đẹp, thành công và hạnh phúc bên anh</p>
+                    </div>
+                    <div class="signature">
+                        Yêu em nhiều lắm ❤️
+                       - Hoàng Tử Của Em -
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.getElementById('canvas'), 
+            alpha: true, 
+            antialias: true 
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        camera.position.z = 30;
+
+        function createHeartShape() {
+            const shape = new THREE.Shape();
+            const x = 0, y = 0;
+            shape.moveTo(x + 0, y + 0);
+            shape.bezierCurveTo(x + 0, y - 0.3, x - 0.6, y - 0.3, x - 0.6, y + 0);
+            shape.bezierCurveTo(x - 0.6, y + 0.3, x + 0, y + 0.6, x + 0, y + 1);
+            shape.bezierCurveTo(x + 0, y + 0.6, x + 0.6, y + 0.3, x + 0.6, y + 0);
+            shape.bezierCurveTo(x + 0.6, y - 0.3, x + 0, y - 0.3, x + 0, y + 0);
+            return shape;
+        }
+
+        const hearts = [];
+        const heartShape = createHeartShape();
+        const heartCount = 40;
+
+        for (let i = 0; i < heartCount; i++) {
+            const extrudeSettings = { 
+                depth: 0.4, 
+                bevelEnabled: true, 
+                bevelThickness: 0.15, 
+                bevelSize: 0.15, 
+                bevelSegments: 5 
+            };
+            const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+            
+            const hue = 0.95 + Math.random() * 0.05;
+            const material = new THREE.MeshStandardMaterial({
+                color: new THREE.Color().setHSL(hue, 0.8, 0.6),
+                emissive: new THREE.Color().setHSL(hue, 1, 0.3),
+                metalness: 0.3,
+                roughness: 0.4,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            const heart = new THREE.Mesh(geometry, material);
+            
+            const radius = 15 + Math.random() * 15;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            
+            heart.position.set(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.sin(phi) * Math.sin(theta),
+                radius * Math.cos(phi) - 10
+            );
+            
+            heart.rotation.set(
+                Math.random() * Math.PI * 2,
+                Math.random() * Math.PI * 2,
+                Math.random() * Math.PI * 2
+            );
+            
+            const scale = 0.3 + Math.random() * 0.4;
+            heart.scale.set(scale, scale, scale);
+            
+            heart.userData = {
+                rotSpeedX: (Math.random() - 0.5) * 0.01,
+                rotSpeedY: (Math.random() - 0.5) * 0.01,
+                rotSpeedZ: (Math.random() - 0.5) * 0.01,
+                orbitSpeed: 0.0003 + Math.random() * 0.0005,
+                orbitRadius: radius,
+                angle: theta,
+                phiAngle: phi,
+                emissiveIntensity: 0.5 + Math.random() * 0.5
+            };
+            
+            hearts.push(heart);
+            scene.add(heart);
+        }
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        mainLight.position.set(5, 5, 10);
+        scene.add(mainLight);
+
+        const light1 = new THREE.PointLight(0xff6b9d, 2, 100);
+        light1.position.set(10, 0, 10);
+        scene.add(light1);
+
+        const light2 = new THREE.PointLight(0xc06c84, 2, 100);
+        light2.position.set(-10, 0, 10);
+        scene.add(light2);
+
+        const light3 = new THREE.PointLight(0xffd1dc, 1.5, 80);
+        light3.position.set(0, 10, 5);
+        scene.add(light3);
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+            
+            const color = new THREE.Color().setHSL(0.95 + Math.random() * 0.05, 0.8, 0.7);
+            colors[i * 3] = color.r;
+            colors[i * 3 + 1] = color.g;
+            colors[i * 3 + 2] = color.b;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            hearts.forEach((heart, i) => {
+                heart.rotation.x += heart.userData.rotSpeedX;
+                heart.rotation.y += heart.userData.rotSpeedY;
+                heart.rotation.z += heart.userData.rotSpeedZ;
+                
+                heart.userData.angle += heart.userData.orbitSpeed;
+                heart.userData.phiAngle += heart.userData.orbitSpeed * 0.5;
+                
+                const radius = heart.userData.orbitRadius;
+                heart.position.x = radius * Math.sin(heart.userData.phiAngle) * Math.cos(heart.userData.angle);
+                heart.position.y = radius * Math.sin(heart.userData.phiAngle) * Math.sin(heart.userData.angle);
+                heart.position.z = radius * Math.cos(heart.userData.phiAngle) - 10;
+                
+                heart.material.emissiveIntensity = heart.userData.emissiveIntensity + Math.sin(time * 2 + i) * 0.3;
+            });
+
+            particles.rotation.y += 0.0003;
+            particles.rotation.x = Math.sin(time * 0.1) * 0.05;
+
+            light1.position.x = Math.sin(time * 0.5) * 15;
+            light1.position.z = Math.cos(time * 0.5) * 15;
+            
+            light2.position.x = Math.cos(time * 0.7) * 15;
+            light2.position.z = Math.sin(time * 0.7) * 15;
+
+            light3.position.y = 10 + Math.sin(time * 0.3) * 5;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = ['💖', '💕', '💗', '💓', '💝'][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            heart.style.animationDelay = Math.random() * 2 + 's';
+            document.getElementById('heartsContainer').appendChild(heart);
+
+            setTimeout(() => heart.remove(), 10000);
+        }
+
+        setInterval(createFloatingHeart, 800);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.querySelector('.card').addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.95) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = e.clientX + 'px';
+                sparkle.style.top = e.clientY + 'px';
+                sparkle.style.setProperty('--tx', (Math.random() - 0.5) * 50 + 'px');
+                sparkle.style.setProperty('--ty', (Math.random() - 0.5) * 50 + 'px');
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 1000);
+            }
+        });
+    </script>
+</body>
+</html>
